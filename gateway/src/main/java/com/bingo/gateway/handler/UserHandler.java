@@ -24,6 +24,7 @@ public class UserHandler {
 
     public Mono<ServerResponse> login(ServerRequest serverRequest) {
         Long userId = Long.parseLong(serverRequest.pathVariable("id"));
+
         Mono<UserDto> user = userWebClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/users/{id}").build(userId)).retrieve()
                 .bodyToMono(UserDto.class);
@@ -33,6 +34,7 @@ public class UserHandler {
 
     public Mono<ServerResponse> register(ServerRequest serverRequest) {
         Mono<UserDto> requestData = serverRequest.bodyToMono(UserDto.class);
+
         return userWebClient.post()
                 .uri("/register")
                 .body(requestData, UserDto.class)

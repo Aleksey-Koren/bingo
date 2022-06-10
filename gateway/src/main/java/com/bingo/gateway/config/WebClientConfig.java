@@ -27,5 +27,4 @@ public class WebClientConfig {
                 .baseUrl("http://GAMBLING-SERVICE/api")
                 .build();
     }
-
 }
