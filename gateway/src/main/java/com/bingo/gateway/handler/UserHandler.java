@@ -10,6 +10,8 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import static org.springframework.web.reactive.function.BodyInserters.*;
+
 @Service
 public class UserHandler {
 
@@ -24,7 +26,7 @@ public class UserHandler {
         Mono<UserDto> dto = userWebClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/users/{id}").build(userId)).retrieve()
                 .bodyToMono(UserDto.class);
-        return dto.flatMap(s -> ServerResponse.ok().body(BodyInserters.fromValue(s)))
+        return dto.flatMap(s -> ServerResponse.ok().body(fromValue(s)))
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
 }

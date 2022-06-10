@@ -2,18 +2,32 @@ server:
   port: 0
 
 spring:
+
   r2dbc:
     url: r2dbc:mariadb://localhost:3306/bingo_invoice
     username: root
     password: 06021988abc
+
   application:
     name: invoice-service
 
+  cloud:
+    stream:
+      bindings:
+        bingoMessages-in-0:
+          group: bets
+          destination: invoice-service
+
+  rabbitmq:
+    username: guest
+    password: guest
 
 eureka:
   instance:
     prefer-ip-address: true
-#    ip-address: 127.0.0.1
+
+
+
 
 logging:
   level:

@@ -21,4 +21,11 @@ public class WebClientConfig {
                 .build();
     }
 
+    @Bean(name = "gamblingService")
+    public WebClient gamblingService() {
+        return builder()
+                .baseUrl("http://GAMBLING-SERVICE/api")
+                .build();
+    }
+
 }
