@@ -1,5 +1,6 @@
 package com.bingo.gateway.handler;
 
+import com.bingo.gateway.dto.BetDto;
 import com.bingo.gateway.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,10 +24,21 @@ public class UserHandler {
 
     public Mono<ServerResponse> login(ServerRequest serverRequest) {
         Long userId = Long.parseLong(serverRequest.pathVariable("id"));
-        Mono<UserDto> dto = userWebClient.get()
+        Mono<UserDto> user = userWebClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/users/{id}").build(userId)).retrieve()
                 .bodyToMono(UserDto.class);
-        return dto.flatMap(s -> ServerResponse.ok().body(fromValue(s)))
+        return user.flatMap(s -> ServerResponse.ok().body(fromValue(s)))
                 .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
+    public Mono<ServerResponse> register(ServerRequest serverRequest) {
+        Mono<UserDto> requestData = serverRequest.bodyToMono(UserDto.class);
+        return userWebClient.post()
+                .uri("/register")
+                .body(requestData, UserDto.class)
+                .retrieve()
+                .bodyToMono(UserDto.class)
+                .flatMap(s -> ServerResponse.ok().body(fromValue(s)))
+                .switchIfEmpty(ServerResponse.badRequest().build());
     }
 }

@@ -19,9 +19,7 @@ public class BetService {
 
     @Bean
     public Consumer<BetDto> newBets() {
-        return bet -> {
-            storeNew(bet);
-        };
+        return this::storeNew;
     }
 
     public Flux<Bet> findAllByUserId(Long userId) {

@@ -35,8 +35,8 @@ public class UserService {
                 .bodyToMono(StatusDto.class);
     }
 
-    public User save(User user) {
-        return null;
+    public Mono<User> save(User user) {
+        return userRepository.save(user);
     }
 
     public void deleteById(Long id) {
