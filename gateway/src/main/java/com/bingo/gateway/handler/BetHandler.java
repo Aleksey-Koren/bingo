@@ -21,6 +21,7 @@ public class BetHandler {
 
     public Mono<ServerResponse> sendBet(ServerRequest serverRequest) {
         Mono<BetDto> betDtoMono = serverRequest.bodyToMono(BetDto.class);
+
         return gamblingWebClient.post()
                 .uri("/bet")
                 .body(betDtoMono, BetDto.class)

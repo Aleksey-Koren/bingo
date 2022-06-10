@@ -3,6 +3,15 @@ server:
 
 spring:
 
+  cloud:
+    stream:
+      bindings:
+        newbets-in-0:
+          group: bets
+          destination: invoice-service
+    function:
+      definition: newBets
+
   r2dbc:
     url: r2dbc:mariadb://localhost:3306/bingo_invoice
     username: root
@@ -10,13 +19,6 @@ spring:
 
   application:
     name: invoice-service
-
-  cloud:
-    stream:
-      bindings:
-        bingoMessages-in-0:
-          group: bets
-          destination: invoice-service
 
   rabbitmq:
     username: guest
@@ -29,9 +31,6 @@ eureka:
 
 
 
-logging:
-  level:
-    org.springframework.cloud.commons.util.InetUtils: trace
 
 
 
