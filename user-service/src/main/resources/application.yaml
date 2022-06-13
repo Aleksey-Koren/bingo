@@ -4,6 +4,7 @@ server:
 spring:
   application:
     name: user-service
+
   r2dbc:
     url: r2dbc:mariadb://localhost:3306/bingo
     username: root
@@ -11,4 +12,5 @@ spring:
 
 eureka:
   instance:
+    instance-id: ${random.value}
     prefer-ip-address: true

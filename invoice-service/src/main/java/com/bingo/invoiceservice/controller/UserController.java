@@ -18,6 +18,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     public Mono<StatusDto> getStatus(@PathVariable("id") Long userId) {
+
         return statusService.getStatus(userId);
     }
 }
