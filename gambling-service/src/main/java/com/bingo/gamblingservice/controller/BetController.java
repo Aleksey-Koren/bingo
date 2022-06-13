@@ -19,6 +19,7 @@ public class BetController {
 
     @PostMapping
     public Mono<ResponseEntity<BetDto>> processBet(@RequestBody Mono<BetDto> dto) {
+
         return betService.processBet(dto).map(ResponseEntity::ok);
     }
 }
