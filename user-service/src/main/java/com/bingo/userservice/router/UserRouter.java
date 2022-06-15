@@ -18,8 +18,8 @@ public class UserRouter {
 
     @Bean
     public RouterFunction<ServerResponse> route(UserHandler userHandler) {
-        return RouterFunctions.route(
-                GET("/api/users/{id}").and(accept(APPLICATION_JSON)), userHandler::findById)
+        return RouterFunctions
+                .route(GET("/api/users/{id}").and(accept(APPLICATION_JSON)), userHandler::findById)
                 .andRoute(POST("/api/register").and(accept(APPLICATION_JSON)), userHandler::register);
     }
 

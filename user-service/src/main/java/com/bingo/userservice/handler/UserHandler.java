@@ -6,6 +6,7 @@ import com.bingo.userservice.entity.User;
 import com.bingo.userservice.mapper.UserMapper;
 import com.bingo.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -24,21 +25,28 @@ public class UserHandler {
         Long userId = Long.parseLong(serverRequest.pathVariable("id"));
         Mono<User> user = userService.findById(userId);
         Mono<StatusDto> status = userService.getStatus(userId);
-        Mono<UserDto> dto = Mono.zip(user, status).map(s -> UserDto.builder()
+        return Mono.zip(user, status).map(s -> UserDto.builder()
                 .id(userId)
                 .title(s.getT1().getTitle())
                 .money(s.getT2().getBalance())
                 .lastOperation(s.getT2().getLastOperation())
-                .build());
-
-        return dto.log().flatMap(s -> ServerResponse.ok().body(fromValue(s)))
+                .build())
+                .flatMap(s -> ServerResponse.ok().body(fromValue(s)))
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
 
     public Mono<ServerResponse> register(ServerRequest serverRequest) {
-        Mono<UserDto> dtoMono = serverRequest.bodyToMono(UserDto.class);
-        Mono<User> userMono = dtoMono.flatMap(s -> Mono.just(userMapper.toEntity(s))).flatMap(userService::save);
-        return userMono.log().flatMap(s -> ServerResponse.ok().body(fromValue(s)))
-                .switchIfEmpty(ServerResponse.notFound().build());
+
+        return serverRequest.bodyToMono(UserDto.class)
+                .flatMap(userDto -> userService.save(userMapper.toEntity(userDto)))
+                .zipWhen(userService::createRegistrationBet)
+                .map(t -> UserDto.builder()
+                        .id(t.getT1().getId())
+                        .title(t.getT1().getTitle())
+                        .money(t.getT2().getMoney())
+                        .lastOperation(t.getT2().getBetId())
+                        .build())
+                .flatMap(response -> ServerResponse.ok().body(fromValue(response)))
+                .switchIfEmpty(ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
 }

@@ -1,35 +1,35 @@
 package com.bingo.userservice.service;
 
+import com.bingo.userservice.dto.BetDto;
 import com.bingo.userservice.dto.StatusDto;
+import com.bingo.userservice.dto.UserDto;
 import com.bingo.userservice.entity.User;
 import com.bingo.userservice.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
-    private final WebClient invoiceServiceClient;
-
-    @Autowired
-    public UserService(UserRepository userRepository, @Qualifier("invoiceService") WebClient webClientPool) {
-        this.userRepository = userRepository;
-        this.invoiceServiceClient = webClientPool;
-    }
+    private final WebClient webClient;
 
     public Mono<User> findById(Long id) {
         return userRepository.findById(id);
     }
 
     public Mono<StatusDto> getStatus(Long userId) {
-        return invoiceServiceClient
+        return webClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/api/status/{id}")
+                        .scheme("http")
+                        .host("gateway")
+                        .path("/invoice-service/api/status/{id}")
                         .build(userId))
                 .retrieve()
                 .bodyToMono(StatusDto.class);
@@ -39,7 +39,19 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public void deleteById(Long id) {
-
+    public Mono<BetDto> createRegistrationBet(User user) {
+        return webClient
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .scheme("http")
+                        .host("gateway")
+                        .path("/gambling-service/api/bet/registration")
+                        .build())
+                .body(BodyInserters.fromValue(BetDto.builder()
+                                                    .userId(user.getId())
+                                                    .build())
+                )
+                .retrieve()
+                .bodyToMono(BetDto.class);
     }
 }

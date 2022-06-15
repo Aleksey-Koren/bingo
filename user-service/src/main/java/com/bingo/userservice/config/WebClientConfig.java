@@ -14,10 +14,8 @@ public class WebClientConfig {
         return WebClient.builder();
     }
 
-    @Bean(name = "invoiceService")
-    public WebClient invoiceClient() {
-       return builder()
-               .baseUrl("http://INVOICE-SERVICE")
-               .build();
+    @Bean
+    public WebClient webClient(WebClient.Builder builder) {
+       return builder.build();
     }
 }

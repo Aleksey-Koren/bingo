@@ -22,4 +22,9 @@ public class BetController {
 
         return betService.processBet(dto).map(ResponseEntity::ok);
     }
+
+    @PostMapping("/registration")
+    public Mono<BetDto> processRegistrationBet(@RequestBody Mono<BetDto> dto) {
+        return betService.processRegistrationBet(dto.log());
+    }
 }

@@ -22,6 +22,10 @@ public class StatusService {
                         .balance(s.getT1())
                         .lastOperation(s.getT2().getBetId())
                         .build()
-                );
+                ).onErrorReturn(StatusDto.builder()
+                        .userId(userId)
+                        .balance(null)
+                        .lastOperation(null)
+                        .build());
     }
 }

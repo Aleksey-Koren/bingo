@@ -12,12 +12,12 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/status")
-public class UserController {
+public class StatusController {
 
     private final StatusService statusService;
 
-    @GetMapping("/{id}")
-    public Mono<StatusDto> getStatus(@PathVariable("id") Long userId) {
+    @GetMapping("/{userId}")
+    public Mono<StatusDto> getStatus(@PathVariable("userId") Long userId) {
 
         return statusService.getStatus(userId);
     }

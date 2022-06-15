@@ -5,18 +5,17 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-public class UserDto {
+public class BetDto {
 
-    private Long id;
-    private String title;
+    private Long userId;
     private Long money;
-    private String lastOperation;
+    private String betId;
+    private String previousBetId;
+    private Boolean hasWon;
 }
