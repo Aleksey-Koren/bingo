@@ -1,0 +1,147 @@
+version: '3.5'
+services:
+
+# -------------------------USER-SERVICE-DB
+
+  user-service-db:
+    container_name: user-service-db
+    image: mariadb:latest
+    hostname: user-service-db
+    environment:
+      MARIADB_DATABASE: bingo
+      MARIADB_USER: root
+      MARIADB_PASSWORD: root
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_ROOT_HOST: jdbc:mariadb://user-service-db:3306/bingo?useSSL=false
+    ports:
+      - "3307:3306"
+
+  # -------------------------INVOICE-SERVICE-DB
+
+  invoice-service-db:
+    container_name: invoice-service-db
+    image: mariadb:latest
+    hostname: invoice-service-db
+    environment:
+      MARIADB_DATABASE: bingo_invoice
+      MARIADB_USER: root
+      MARIADB_PASSWORD: root
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_ROOT_HOST: jdbc:mariadb://invoice-service-db:3306/bingo_invoice?useSSL=false
+    ports:
+      - "3308:3306"
+
+
+#  -------------------------ZIPKIN
+
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: 'zipkin'
+    hostname: zipkin
+    ports:
+      - "9411:9411"
+
+
+# -----------------------EUREKA
+  service-discovery:
+    container_name: service-discovery
+    build: ./service-discovery
+    hostname: service-discovery
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "eureka.client.service-url.defaultZone": "http://service-discovery:8761/eureka",
+        "eureka.client.instance.hostname": "service-discovery",
+        "spring.zipkin.base-url": "http://zipkin:9411/"
+      }'
+    ports:
+      - "8761:8761"
+
+#------------------------RABBITMQ
+
+  rabbit:
+    container_name: rabbit
+    image: rabbitmq:3-management-alpine
+    hostname: rabbit
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+#----------------------------------USER-SERVICE
+
+  user-service:
+    container_name: user-service
+    build: ./user-service
+    hostname: user-service
+    environment:
+      BINGO_DB_USER: root
+      BINGO_DB_PASS: root
+      BINGO_DB_URL_R2DBC: r2dbc:mariadb://user-service-db:3306/bingo
+      BINGO_DB_URL: "jdbc:mariadb://user-service-db:3306/bingo?useSSL=false"
+      SPRING_APPLICATION_JSON: '{
+        "spring.zipkin.base-url": "http://zipkin:9411/",
+        "eureka.client.service-url.defaultZone": "http://service-discovery:8761/eureka"
+      }'
+    restart: unless-stopped
+    depends_on:
+      - user-service-db
+      - service-discovery
+
+#-----------------------------------INVOICE-SERVICE
+
+  invoice-service:
+    container_name: invoice-service
+    build: ./invoice-service
+    hostname: invoice-service
+    environment:
+      BINGO_INVOICE_DB_USER: root
+      BINGO_INVOICE_DB_PASS: root
+      BINGO_INVOICE_DB_URL_R2DBC: r2dbc:mariadb://invoice-service-db:3306/bingo_invoice
+      BINGO_INVOICE_DB_URL: "jdbc:mariadb://invoice-service-db:3306/bingo_invoice?useSSL=false"
+      SPRING_APPLICATION_JSON: '{
+          "spring.zipkin.base-url": "http://zipkin:9411/",
+          "eureka.client.service-url.defaultZone": "http://service-discovery:8761/eureka",
+          "spring.rabbitmq.host": "rabbit",
+          "spring.rabbitmq.port": "5672",
+          "spring.rabbitmq.password": "guest"
+        }'
+    restart: unless-stopped
+    depends_on:
+      - invoice-service-db
+      - service-discovery
+      - rabbit
+
+#---------------------------------GAMBLING-SERVICE
+
+  gambling-service:
+    container_name: gambling-service
+    build: ./gambling-service
+    hostname: gambling-service
+    environment:
+      SPRING_APPLICATION_JSON: '{
+            "spring.zipkin.base-url": "http://zipkin:9411/",
+            "eureka.client.service-url.defaultZone": "http://service-discovery:8761/eureka",
+            "spring.rabbitmq.host": "rabbit",
+            "spring.rabbitmq.port": "5672",
+            "spring.rabbitmq.password": "guest"
+          }'
+      restart: unless-stopped
+    depends_on:
+      - invoice-service-db
+      - service-discovery
+      - rabbit
+
+#----------------------------------GATEWAY
+
+  gateway:
+    container_name: gateway
+    build: ./gateway
+    hostname: gateway
+    environment:
+      SPRING_APPLICATION_JSON: '{
+            "spring.zipkin.base-url": "http://zipkin:9411/",
+            "eureka.client.service-url.defaultZone": "http://service-discovery:8761/eureka"
+          }'
+    ports:
+      - "8080:8080"
+    depends_on:
+      - service-discovery
