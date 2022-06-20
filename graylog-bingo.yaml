@@ -1,10 +1,12 @@
-version: '3'
+version: '3.5'
 services:
     # MongoDB: https://hub.docker.com/_/mongo/
     mongo:
       image: mongo:4.2
       networks:
-        - graylog
+        - bingo
+
+
     # Elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/7.10/docker.html
     elasticsearch:
       image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
@@ -22,7 +24,10 @@ services:
           limits:
             memory: 1g
       networks:
-        - graylog
+        - bingo
+
+
+
     # Graylog: https://hub.docker.com/r/graylog/graylog/
     graylog:
       image: graylog/graylog:4.2
@@ -34,7 +39,7 @@ services:
         - GRAYLOG_HTTP_EXTERNAL_URI=http://127.0.0.1:9000/
       entrypoint: /usr/bin/tini -- wait-for-it elasticsearch:9200 --  /docker-entrypoint.sh
       networks:
-        - graylog
+        - bingo
       restart: always
       depends_on:
         - mongo
@@ -50,6 +55,11 @@ services:
         - 12201:12201
         # GELF UDP
         - 12201:12201/udp
+
+
+
+
 networks:
-    graylog:
-      driver: bridge
+  bingo:
+    driver: bridge
+    name: bingo

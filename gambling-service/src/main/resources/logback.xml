@@ -13,7 +13,6 @@
         <maxChunkSize>508</maxChunkSize>
         <useCompression>true</useCompression>
         <encoder class="de.siegmar.logbackgelf.GelfEncoder">
-            <originHost>${BINGO_GRAYLOG_HOST}</originHost>
             <includeRawMessage>false</includeRawMessage>
             <includeMarker>true</includeMarker>
             <includeMdcData>true</includeMdcData>

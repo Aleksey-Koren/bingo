@@ -8,12 +8,11 @@
         </encoder>
     </appender>
     <appender name="GELF" class="de.siegmar.logbackgelf.GelfUdpAppender">
-        <graylogHost>127.0.0.1</graylogHost>
-        <graylogPort>12201</graylogPort>
+        <graylogHost>${BINGO_GRAYLOG_HOST}}</graylogHost>
+        <graylogPort>${BINGO_GRAYLOG_PORT}</graylogPort>
         <maxChunkSize>508</maxChunkSize>
         <useCompression>true</useCompression>
         <encoder class="de.siegmar.logbackgelf.GelfEncoder">
-<!--            <originHost>${BINGO_GRAYLOG_HOST}</originHost>-->
             <includeRawMessage>false</includeRawMessage>
             <includeMarker>true</includeMarker>
             <includeMdcData>true</includeMdcData>

@@ -15,6 +15,8 @@ services:
       MARIADB_ROOT_HOST: jdbc:mariadb://user-service-db:3306/bingo?useSSL=false
     ports:
       - "3307:3306"
+    networks:
+      - bingo
 
   # -------------------------INVOICE-SERVICE-DB
 
@@ -30,9 +32,10 @@ services:
       MARIADB_ROOT_HOST: jdbc:mariadb://invoice-service-db:3306/bingo_invoice?useSSL=false
     ports:
       - "3308:3306"
+    networks:
+      - bingo
 
-
-#  -------------------------ZIPKIN
+  #  -------------------------ZIPKIN
 
   zipkin:
     image: openzipkin/zipkin
@@ -40,14 +43,17 @@ services:
     hostname: zipkin
     ports:
       - "9411:9411"
+    networks:
+      - bingo
 
-
-# -----------------------EUREKA
+  # -----------------------EUREKA
   service-discovery:
     container_name: service-discovery
     build: ./service-discovery
     hostname: service-discovery
     environment:
+      BINGO_GRAYLOG_HOST: graylog
+      BINGO_GRAYLOG_PORT: 12201
       SPRING_APPLICATION_JSON: '{
         "eureka.client.service-url.defaultZone": "http://service-discovery:8761/eureka",
         "eureka.client.instance.hostname": "service-discovery",
@@ -55,8 +61,10 @@ services:
       }'
     ports:
       - "8761:8761"
+    networks:
+      - bingo
 
-#------------------------RABBITMQ
+  #------------------------RABBITMQ
 
   rabbit:
     container_name: rabbit
@@ -65,8 +73,10 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    networks:
+      - bingo
 
-#----------------------------------USER-SERVICE
+  #----------------------------------USER-SERVICE
 
   user-service:
     container_name: user-service
@@ -77,6 +87,8 @@ services:
       BINGO_DB_PASS: root
       BINGO_DB_URL_R2DBC: r2dbc:mariadb://user-service-db:3306/bingo
       BINGO_DB_URL: "jdbc:mariadb://user-service-db:3306/bingo?useSSL=false"
+      BINGO_GRAYLOG_HOST: graylog
+      BINGO_GRAYLOG_PORT: 12201
       SPRING_APPLICATION_JSON: '{
         "spring.zipkin.base-url": "http://zipkin:9411/",
         "eureka.client.service-url.defaultZone": "http://service-discovery:8761/eureka"
@@ -85,8 +97,10 @@ services:
     depends_on:
       - user-service-db
       - service-discovery
+    networks:
+      - bingo
 
-#-----------------------------------INVOICE-SERVICE
+  #-----------------------------------INVOICE-SERVICE
 
   invoice-service:
     container_name: invoice-service
@@ -97,6 +111,8 @@ services:
       BINGO_INVOICE_DB_PASS: root
       BINGO_INVOICE_DB_URL_R2DBC: r2dbc:mariadb://invoice-service-db:3306/bingo_invoice
       BINGO_INVOICE_DB_URL: "jdbc:mariadb://invoice-service-db:3306/bingo_invoice?useSSL=false"
+      BINGO_GRAYLOG_HOST: graylog
+      BINGO_GRAYLOG_PORT: 12201
       SPRING_APPLICATION_JSON: '{
           "spring.zipkin.base-url": "http://zipkin:9411/",
           "eureka.client.service-url.defaultZone": "http://service-discovery:8761/eureka",
@@ -109,14 +125,18 @@ services:
       - invoice-service-db
       - service-discovery
       - rabbit
+    networks:
+      - bingo
 
-#---------------------------------GAMBLING-SERVICE
+  #---------------------------------GAMBLING-SERVICE
 
   gambling-service:
     container_name: gambling-service
     build: ./gambling-service
     hostname: gambling-service
     environment:
+      BINGO_GRAYLOG_HOST: graylog
+      BINGO_GRAYLOG_PORT: 12201
       SPRING_APPLICATION_JSON: '{
             "spring.zipkin.base-url": "http://zipkin:9411/",
             "eureka.client.service-url.defaultZone": "http://service-discovery:8761/eureka",
@@ -129,14 +149,18 @@ services:
       - invoice-service-db
       - service-discovery
       - rabbit
+    networks:
+      - bingo
 
-#----------------------------------GATEWAY
+  #----------------------------------GATEWAY
 
   gateway:
     container_name: gateway
     build: ./gateway
     hostname: gateway
     environment:
+      BINGO_GRAYLOG_HOST: graylog
+      BINGO_GRAYLOG_PORT: 12201
       SPRING_APPLICATION_JSON: '{
             "spring.zipkin.base-url": "http://zipkin:9411/",
             "eureka.client.service-url.defaultZone": "http://service-discovery:8761/eureka"
@@ -145,3 +169,10 @@ services:
       - "8080:8080"
     depends_on:
       - service-discovery
+    networks:
+      - bingo
+
+
+networks:
+  bingo:
+    external: true
