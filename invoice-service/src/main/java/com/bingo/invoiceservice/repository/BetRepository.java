@@ -9,4 +9,6 @@ public interface BetRepository extends ReactiveSortingRepository<Bet, Long>  {
     Flux<Bet> findAllByUserId(Long userId);
 
     Flux<Bet> findAllByUserIdOrderByCreatedDesc(Long userId);
+
+    Flux<Bet> findAllByUserIdOrderByCreatedAsc(Long userId);
 }
