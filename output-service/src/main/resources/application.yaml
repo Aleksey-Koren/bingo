@@ -1,0 +1,15 @@
+server:
+  port: 0
+
+spring:
+  application:
+    name: output-service
+  zipkin:
+    base-url: http://localhost:9411/
+
+eureka:
+  instance:
+    instance-id: ${random.value}
+    prefer-ip-address: true
+
+

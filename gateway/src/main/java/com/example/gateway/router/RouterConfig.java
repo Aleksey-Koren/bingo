@@ -30,6 +30,12 @@ public class RouterConfig {
                                 .method(HttpMethod.values())
                                 .filters(filter -> filter.stripPrefix(1))
                                 .uri("lb://gambling-service"))
+                .route("output_service_route",
+                        route -> route.path("/output-service/**")
+                                .and()
+                                .method(HttpMethod.values())
+                                .filters(filter -> filter.stripPrefix(1))
+                                .uri("lb://output-service"))
                 .build();
     }
 }

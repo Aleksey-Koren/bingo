@@ -36,17 +36,17 @@ public class InvoiceService {
                     el.setIsBetChainClear(s.get(i).getPreviousBetId().equals(s.get(i - 1).getBetId()));
                     if (!el.getIsBetChainClear()) {
                         isBetChainClear = false;
-                        errorDetails.append("| Bet chain is interrupted |");
+                        errorDetails.append("Bet chain is interrupted.");
                     }
                     if(isMoneyClear) {
                         el.setIsMoneyClear(el.getMoney() <= money);
                         if(!el.getIsMoneyClear()) {
                             isMoneyClear = false;
-                            errorDetails.append("| Bet money are impossible |");
+                            errorDetails.append("Bet money are impossible.");
                         }
                     }else {
                         el.setIsMoneyClear(false);
-                        errorDetails.append("| Money could be impossible. Errors in previous bets");
+                        errorDetails.append("Money might be impossible --- errors in previous bets.");
                     }
                     el.setErrorDetails(errorDetails.toString());
                 }else{

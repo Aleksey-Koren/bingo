@@ -128,6 +128,30 @@ services:
     networks:
       - bingo
 
+  #---------------------------------OUTPUT-SERVICE
+
+  output-service:
+    container_name: output-service
+    build: ./output-service
+    hostname: output-service
+    environment:
+      BINGO_GRAYLOG_HOST: graylog
+      BINGO_GRAYLOG_PORT: 12201
+      SPRING_APPLICATION_JSON: '{
+             "spring.zipkin.base-url": "http://zipkin:9411/",
+             "eureka.client.service-url.defaultZone": "http://service-discovery:8761/eureka",
+             "spring.rabbitmq.host": "rabbit",
+             "spring.rabbitmq.port": "5672",
+             "spring.rabbitmq.password": "guest"
+           }'
+      restart: unless-stopped
+    depends_on:
+      - invoice-service-db
+      - user-service-db
+      - service-discovery
+    networks:
+      - bingo
+
   #---------------------------------GAMBLING-SERVICE
 
   gambling-service:

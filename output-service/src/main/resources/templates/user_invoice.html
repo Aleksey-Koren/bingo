@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Invoice</title>
+    <style>
+        @page {
+            @bottom-right-corner {
+                font-weight: bold;
+                font-size: 2em;
+                content: counter(page);
+
+            }
+            @top-center {
+
+                content: element(header);
+
+            }
+            margin-top: 10%;
+            size: A4 portrait;
+        }
+
+        td {
+            border: black 2px solid;
+            margin: 0;
+        }
+
+        table {
+            border-spacing: 2px 2px;
+        }
+
+        .header {
+            position: running(header);
+            text-align: center
+        }
+
+    </style>
+</head>
+<body>
+    <div >
+        <h1 class="header" th:text="${user.title}"/>
+    </div>
+        <table class="table">
+            <tr class="table_header">
+                <td><h2>Bet Id</h2></td>
+                <td><h2>Previous Bet Id</h2></td>
+                <td><h2>Created</h2></td>
+                <td><h2>Money</h2></td>
+                <td><h2>Bet Chain Error</h2></td>
+                <td><h2>Money Error</h2></td>
+                <td><h2>Error Description</h2></td>
+            </tr>
+            <tr th:each="element : ${elements}" style="page-break-inside: avoid">
+                <td th:text="${element.betId}"/>
+                <td th:text="${element.previousBetId}"/>
+                <td th:text="${element.created}"/>
+                <td th:text="${element.money}"/>
+                <td th:text="${element.isBetChainClear} == false ? 'ChainERR' : ''"
+                    th:style="${element.isBetChainClear} == false ? 'background-color: red'"/>
+                <td th:text="${element.isMoneyClear} == false ? 'MoneyERR' : ''"
+                    th:style="${element.isMoneyClear} == false ? 'background-color: red'"/>
+                <td th:text="${element.errorDetails}"/>
+            </tr>
+        </table>
+</body>
+</html>

@@ -35,6 +35,13 @@ public class UserHandler {
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
 
+    public Mono<ServerResponse> findTitleById(ServerRequest serverRequest) {
+        Long userId = Long.parseLong(serverRequest.pathVariable("id"));
+        Mono<UserDto> userDto = userService.findById(userId).map(userMapper::toDto);
+        return  userDto.flatMap(userDtoResp -> ServerResponse.ok().body(fromValue(userDtoResp)))
+                .switchIfEmpty(ServerResponse.status(HttpStatus.NOT_FOUND).build());
+    }
+
     public Mono<ServerResponse> register(ServerRequest serverRequest) {
 
         return serverRequest.bodyToMono(UserDto.class)
