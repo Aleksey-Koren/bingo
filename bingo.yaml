@@ -139,7 +139,7 @@ services:
       BINGO_GRAYLOG_PORT: 12201
       SPRING_APPLICATION_JSON: '{
              "spring.zipkin.base-url": "http://zipkin:9411/",
-             "eureka.client.service-url.defaultZone": "http://service-discovery:8761/eureka",
+             "eureka.client.service-url.defaultZone": "http://service-discovery:8761/eureka"
            }'
       restart: unless-stopped
     depends_on:
